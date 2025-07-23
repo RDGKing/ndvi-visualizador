@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evaluación de NDVI</title>
+    <meta name="description" content="Visualizador interactivo de NDVI y RGB para análisis de vegetación." />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+<header>
+    <h1>Evaluación de los árboles en el Bosque de Aragón</h1>
+    <p>Monitoreo de salud y vegetación mediante imágenes NDVI y RGB</p>
+</header>
+
+
+    <main class="container">
+        <div id="map"></div>
+
+        <aside id="sidebar">
+            <div class="sidebar-content">
+
+                <h2><i class="fas fa-layer-group"></i> Capas Disponibles</h2>
+                <div class="layer-controls">
+                    <label for="toggle-ndvi" class="layer-checkbox">
+                        <input type="checkbox" id="toggle-ndvi" checked />
+                        <span class="checkmark"></span>
+                        Capa NDVI
+                    </label>
+                    <label for="toggle-rgb" class="layer-checkbox">
+                        <input type="checkbox" id="toggle-rgb" checked />
+                        <span class="checkmark"></span>
+                        Imagen RGB
+                    </label>
+                    <label for="toggle-trees" class="layer-checkbox">
+                        <input type="checkbox" id="toggle-trees" checked />
+                        <span class="checkmark"></span>
+                        Capa de Árboles
+                    </label>
+                </div>
+
+                <div id="opacity-control" class="sidebar-opacity">
+                    <label for="opacity-slider">Opacidad NDVI:</label>
+                    <input type="range" id="opacity-slider" min="0.1" max="1" step="0.05" value="0.8" />
+                    <span id="opacity-value">80%</span>
+                </div>
+
+
+                <h2><i class="fas fa-map-legend"></i> Leyenda NDVI</h2>
+                <div id="legend" class="legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #006837;"></span>
+                        <span class="legend-label">0.8 — 1.0: Vegetación densa o vigorosa</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #1a9850;"></span>
+                        <span class="legend-label">0.5 — 0.79: Vegetación saludable</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #a6d96a;"></span>
+                        <span class="legend-label">0.2 — 0.49: Vegetación escasa</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #ffffbf;"></span>
+                        <span class="legend-label">0.0 — 0.19: Suelo expuesto</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #a50026;"></span>
+                        <span class="legend-label">-1.0 — -0.1: Área sin vegetación</span>
+                    </div>
+                </div>
+
+                <h2><i class="fas fa-tree"></i> Clasificación de Salud de los Árboles</h2>
+                <div id="tree-legend" class="legend">
+                    <div><span style="background:#006837;"></span> Árbol con vegetación densa o vigorosa (NDVI ≥ 0.8)
+                    </div>
+                    <div><span style="background:#1a9850;"></span> Árbol saludable (0.5 - 0.79)</div>
+                    <div><span style="background:#a6d96a;"></span> Árbol con vegetación escasa (0.2 - 0.49)</div>
+                    <div><span style="background:#ffffbf;"></span> Árbol con suelo expuesto (0.0 - 0.19)</div>
+                    <div><span style="background:#a50026;"></span> Área sin vegetación (-1.0 - -0.01)</div>
+                </div>
+
+                <h2><i class="fas fa-chart-line"></i> Indice de vegetación del Árbol</h2>
+                <div class="stat-item">
+                    <span class="stat-label">NDVI:</span>
+                    <span id="mean-ndvi" class="stat-value">-</span>
+                </div>
+
+                <h2><i class="fas fa-seedling"></i> Estado del Árbol</h2>
+                <div class="stat-item">
+                    <span class="stat-label">Salud:</span>
+                    <span id="tree-health" class="stat-value">-</span>
+                </div>
+
+                <h2><i class="fas fa-tree"></i> Número de árboles por categoría</h2>
+                <div id="tree-counts" class="tree-counts">
+                    <div class="count-item">
+                        <span class="count-label">Vegetación densa o vigorosa:</span>
+                        <span id="dense-count" class="count-value">0</span>
+                    </div>
+                    <div class="count-item">
+                        <span class="count-label">Saludable:</span>
+                        <span id="healthy-count" class="count-value">0</span>
+                    </div>
+                    <div class="count-item">
+                        <span class="count-label">Vegetación escasa:</span>
+                        <span id="sparse-count" class="count-value">0</span>
+                    </div>
+                    <div class="count-item">
+                        <span class="count-label">Suelo expuesto:</span>
+                        <span id="bare-count" class="count-value">0</span>
+                    </div>
+                    <div class="count-item">
+                        <span class="count-label">Sin vegetación:</span>
+                        <span id="none-count" class="count-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/georaster"></script>
+    <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="javascript/script.js" defer></script>
+</body>
+
+</html>

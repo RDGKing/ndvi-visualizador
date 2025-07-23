@@ -1,0 +1,215 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: #27ae60;
+  color: white;
+  padding: 0.8rem 1rem;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1000;
+  flex-shrink: 0;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+header p {
+  margin: 0.3rem 0 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.container {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  height: calc(100vh - 65px);
+}
+
+#map {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  z-index: 1;
+}
+
+#sidebar {
+  width: 300px;
+  background: #f8f9fa;
+  overflow-y: auto;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+  z-index: 10;
+  padding: 1rem;
+  flex-shrink: 0;
+}
+
+.sidebar-content h2 {
+  font-size: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #27ae60;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.layer-controls {
+  margin-bottom: 1rem;
+}
+
+.layer-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.layer-checkbox input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.stat-label {
+  font-weight: 500;
+}
+
+.stat-value {
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.legend {
+  background: white;
+  padding: 0.8rem;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+
+.legend-color {
+  width: 18px;
+  height: 18px;
+  margin-right: 0.6rem;
+  border: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  font-size: 0.85rem;
+}
+
+#tree-legend div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+}
+
+#tree-legend span {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+.tree-counts {
+  background: white;
+  padding: 0.8rem;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  margin-top: 1rem;
+}
+
+.count-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.count-label {
+  font-weight: 500;
+}
+
+.count-value {
+  font-weight: bold;
+  color: #27ae60;
+}
+
+/* 🎯 Nuevo estilo para el control de opacidad embebido en el sidebar */
+.sidebar-opacity {
+  background: white;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar-opacity label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+#opacity-slider {
+  width: 100%;
+  margin-bottom: 0.3rem;
+}
+
+#opacity-value {
+  display: inline-block;
+  width: 40px;
+  text-align: right;
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #27ae60;
+}
+
+/* 🔁 Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  #sidebar {
+    width: 100%;
+    height: auto;
+    order: 2;
+  }
+
+  #map {
+    order: 1;
+    height: calc(100vh - 65px - 320px);
+  }
+}
