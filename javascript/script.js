@@ -1,5 +1,4 @@
 
-
 let map = L.map('map');
 let ndviLayer, rgbLayer, treesLayer;
 
@@ -187,4 +186,3 @@ function colorPorSalud(salud) {
     default: return "#999999";
   }
 }
-
