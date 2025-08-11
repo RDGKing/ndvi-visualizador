@@ -1,13 +1,31 @@
-let map = L.map('map');
 
-let ndviLayer, rgbLayer, treesLayer; // agrega treesLayer aquí
+
+let map = L.map('map');
+let ndviLayer, rgbLayer, treesLayer;
 
 map.setZoom(30);
+
+
+const menuToggle = document.querySelector('.menu-toggle');
+const menuClose = document.querySelector('.menu-close');
+const sidebar = document.getElementById('sidebar');
+
+menuToggle.addEventListener('click', () => {
+  sidebar.classList.add('active');       // abre el menú
+  menuToggle.style.display = 'none';     // oculta el botón abrir
+  menuClose.style.display = 'block';     // muestra el botón cerrar
+});
+
+menuClose.addEventListener('click', () => {
+  sidebar.classList.remove('active');    // cierra el menú
+  menuToggle.style.display = 'block';    // muestra el botón abrir
+  menuClose.style.display = 'none';      // oculta el botón cerrar
+});
+
 
 fetch('assets/arboles_salud.geojson')
   .then(response => response.json())
   .then(data => {
-    // Inicializar contadores
     const counts = {
       "Árbol con vegetación densa o vigorosa": 0,
       "Árbol saludable": 0,
@@ -21,7 +39,6 @@ fetch('assets/arboles_salud.geojson')
       style: feature => {
         const mean = feature.properties.mean;
         const salud = clasificarSalud(mean);
-        // Incrementar contador por categoría
         counts[salud] = (counts[salud] || 0) + 1;
 
         return {
@@ -35,24 +52,19 @@ fetch('assets/arboles_salud.geojson')
         layer.on('click', () => {
           const mean = feature.properties.mean;
           const salud = clasificarSalud(mean);
-
           document.getElementById('mean-ndvi').textContent = mean?.toFixed(2) ?? '-';
           document.getElementById('tree-health').textContent = salud ?? '-';
         });
       }
     }).addTo(map);
 
-    // Actualizar los contadores en el DOM
-    document.getElementById('dense-count').textContent = counts["Árbol con vegetación densa o vigorosa"] ?? 0;
-    document.getElementById('healthy-count').textContent = counts["Árbol saludable"] ?? 0;
-    document.getElementById('sparse-count').textContent = counts["Árbol con vegetación escasa"] ?? 0;
-    document.getElementById('bare-count').textContent = counts["Árbol con suelo expuesto"] ?? 0;
-    document.getElementById('none-count').textContent = counts["Área sin vegetación"] ?? 0;
-    document.getElementById('nodata-count').textContent = counts["Sin datos"] ?? 0;
-
+    document.getElementById('dense-count').textContent = counts["Árbol con vegetación densa o vigorosa"];
+    document.getElementById('healthy-count').textContent = counts["Árbol saludable"];
+    document.getElementById('sparse-count').textContent = counts["Árbol con vegetación escasa"];
+    document.getElementById('bare-count').textContent = counts["Árbol con suelo expuesto"];
+    document.getElementById('none-count').textContent = counts["Área sin vegetación"];
+    document.getElementById('nodata-count').textContent = counts["Sin datos"];
   });
-
-
 
 // Cargar capa NDVI
 fetch('assets/ndvi.tif')
@@ -76,15 +88,13 @@ fetch('assets/ndvi.tif')
       });
       ndviLayer.addTo(map);
 
-      // Ajustar vista, límites y comportamiento del mapa
       const bounds = ndviLayer.getBounds();
       map.fitBounds(bounds);
       map.setMaxBounds(bounds);
       map.on('drag', () => map.panInsideBounds(bounds, { animate: false }));
-      map.setMinZoom(map.getZoom() + 1); // evitar zoom out excesivo
-      map.setMaxZoom(24); // puedes ajustarlo según tu raster
-      map.setZoom(21); // ahora sí establece zoom inicial (ajústalo según tu preferencia)
-
+      map.setMinZoom(map.getZoom() + 1);
+      map.setMaxZoom(24);
+      map.setZoom(21);
     });
   });
 
@@ -103,42 +113,51 @@ fetch('assets/RGB_Area.tif')
   });
 
 // Control de visibilidad de capas
-document.getElementById('toggle-ndvi').addEventListener('change', (e) => {
+// Función para contar cuántas capas están activas
+function capasActivas() {
+  let count = 0;
+  if (map.hasLayer(ndviLayer)) count++;
+  if (map.hasLayer(treesLayer)) count++;
+  if (map.hasLayer(rgbLayer)) count++;
+  return count;
+}
+
+// Control de visibilidad de capas con restricción
+document.getElementById('toggle-ndvi').addEventListener('change', e => {
   if (ndviLayer) {
-    if (e.target.checked) {
-      map.addLayer(ndviLayer);
-    } else {
-      map.removeLayer(ndviLayer);
+    if (!e.target.checked && capasActivas() === 1) {
+      e.target.checked = true; // No permitir quitar la última capa
+      return;
     }
+    e.target.checked ? map.addLayer(ndviLayer) : map.removeLayer(ndviLayer);
   }
 });
 
-document.getElementById('toggle-trees').addEventListener('change', (e) => {
+document.getElementById('toggle-trees').addEventListener('change', e => {
   if (treesLayer) {
-    if (e.target.checked) {
-      map.addLayer(treesLayer);
-    } else {
-      map.removeLayer(treesLayer);
+    if (!e.target.checked && capasActivas() === 1) {
+      e.target.checked = true;
+      return;
     }
+    e.target.checked ? map.addLayer(treesLayer) : map.removeLayer(treesLayer);
   }
 });
 
-document.getElementById('toggle-rgb').addEventListener('change', (e) => {
+document.getElementById('toggle-rgb').addEventListener('change', e => {
   if (rgbLayer) {
-    if (e.target.checked) {
-      map.addLayer(rgbLayer);
-    } else {
-      map.removeLayer(rgbLayer);
+    if (!e.target.checked && capasActivas() === 1) {
+      e.target.checked = true;
+      return;
     }
+    e.target.checked ? map.addLayer(rgbLayer) : map.removeLayer(rgbLayer);
   }
 });
 
 
-// Vincular slider de opacidad al NDVI
+// Opacidad NDVI
 const opacitySlider = document.getElementById('opacity-slider');
 const opacityValue = document.getElementById('opacity-value');
-
-opacitySlider.addEventListener('input', (e) => {
+opacitySlider.addEventListener('input', e => {
   const value = parseFloat(e.target.value);
   if (ndviLayer) {
     ndviLayer.setOpacity(value);
@@ -146,8 +165,7 @@ opacitySlider.addEventListener('input', (e) => {
   }
 });
 
-
-// Función clasificarSalud actualizada
+// Clasificación de salud
 function clasificarSalud(mean) {
   if (mean === null || isNaN(mean)) return "Sin datos";
   if (mean >= 0.8) return "Árbol con vegetación densa o vigorosa";
@@ -158,7 +176,7 @@ function clasificarSalud(mean) {
   return "Sin datos";
 }
 
-// Función colorPorSalud actualizada
+// Color según salud
 function colorPorSalud(salud) {
   switch (salud) {
     case "Árbol con vegetación densa o vigorosa": return "#006837";
@@ -169,3 +187,4 @@ function colorPorSalud(salud) {
     default: return "#999999";
   }
 }
+
