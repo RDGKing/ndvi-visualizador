@@ -22,6 +22,10 @@ menuClose.addEventListener('click', () => {
 });
 
 
+
+
+let selectedTree = null; // Guardará la capa del árbol seleccionado
+
 fetch('assets/arboles_salud.geojson')
   .then(response => response.json())
   .then(data => {
@@ -51,8 +55,31 @@ fetch('assets/arboles_salud.geojson')
         layer.on('click', () => {
           const mean = feature.properties.mean;
           const salud = clasificarSalud(mean);
+
+          // Actualiza el panel de información
           document.getElementById('mean-ndvi').textContent = mean?.toFixed(2) ?? '-';
           document.getElementById('tree-health').textContent = salud ?? '-';
+
+          // Quita el resaltado del árbol anterior
+          if (selectedTree) {
+            const prevSalud = clasificarSalud(selectedTree.feature.properties.mean);
+            selectedTree.setStyle({
+              color: colorPorSalud(prevSalud),
+              weight: 1,
+              fillColor: colorPorSalud(prevSalud),
+              fillOpacity: 0.6
+            });
+          }
+
+          // Aplica resaltado al árbol actual
+          layer.setStyle({
+            color: '#FFD700', // Dorado brillante para el borde
+            weight: 4,
+            fillColor: colorPorSalud(salud),
+            fillOpacity: 0.8
+          });
+
+          selectedTree = layer; // Guarda el árbol actual como seleccionado
         });
       }
     }).addTo(map);
@@ -64,6 +91,7 @@ fetch('assets/arboles_salud.geojson')
     document.getElementById('none-count').textContent = counts["Área sin vegetación"];
     document.getElementById('nodata-count').textContent = counts["Sin datos"];
   });
+
 
 // Cargar capa NDVI
 fetch('assets/ndvi.tif')
@@ -186,3 +214,7 @@ function colorPorSalud(salud) {
     default: return "#999999";
   }
 }
+
+
+
+
