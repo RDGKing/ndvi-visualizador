@@ -56,11 +56,39 @@ fetch('assets/arboles_salud.geojson')
           const mean = feature.properties.mean;
           const salud = clasificarSalud(mean);
 
-          // Actualiza el panel de información
+          // Actualiza NDVI
           document.getElementById('mean-ndvi').textContent = mean?.toFixed(2) ?? '-';
-          document.getElementById('tree-health').textContent = salud ?? '-';
 
-          // Quita el resaltado del árbol anterior
+          // Elemento del estado del árbol
+          const treeHealthElement = document.getElementById('tree-health');
+          treeHealthElement.textContent = salud ?? '-';
+
+          // Quitar clases anteriores (deja solo la base)
+          treeHealthElement.className = 'tree-health-value';
+
+          // Asignar color según salud
+          switch (salud) {
+            case "Árbol con vegetación densa o vigorosa":
+              treeHealthElement.classList.add('health-dense-bg');
+              break;
+            case "Árbol saludable":
+              treeHealthElement.classList.add('health-healthy-bg');
+              break;
+            case "Árbol con vegetación escasa":
+              treeHealthElement.classList.add('health-sparse-bg');
+              break;
+            case "Árbol con suelo expuesto":
+              treeHealthElement.classList.add('health-bare-bg');
+              break;
+            case "Área sin vegetación":
+              treeHealthElement.classList.add('health-none-bg');
+              break;
+            default:
+              treeHealthElement.classList.add('health-nodata-bg');
+              break;
+          }
+
+          // Quitar resaltado del árbol anterior
           if (selectedTree) {
             const prevSalud = clasificarSalud(selectedTree.feature.properties.mean);
             selectedTree.setStyle({
@@ -71,17 +99,18 @@ fetch('assets/arboles_salud.geojson')
             });
           }
 
-          // Aplica resaltado al árbol actual
+          // Resaltar el árbol actual
           layer.setStyle({
-            color: '#FFD700', // Dorado brillante para el borde
+            color: '#FFD700',
             weight: 4,
             fillColor: colorPorSalud(salud),
             fillOpacity: 0.8
           });
 
-          selectedTree = layer; // Guarda el árbol actual como seleccionado
+          selectedTree = layer;
         });
       }
+
     }).addTo(map);
 
     document.getElementById('dense-count').textContent = counts["Árbol con vegetación densa o vigorosa"];
