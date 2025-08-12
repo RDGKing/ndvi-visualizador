@@ -316,3 +316,20 @@ header p {
   }
   #sidebar.active { left: 0; }
 }
+
+.tree-health-value {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-align: center;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Colores según salud */
+.health-dense-bg { background-color: #006837; color: #fff; }
+.health-healthy-bg { background-color: #1a9850; color: #fff; }
+.health-sparse-bg { background-color: #a6d96a; color: #000; }
+.health-bare-bg { background-color: #ffffbf; color: #000; }
+.health-none-bg { background-color: #a50026; color: #fff; }
+.health-nodata-bg { background-color: #999; color: #fff; }
