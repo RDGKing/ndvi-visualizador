@@ -1,4 +1,4 @@
-# NDVI Visualizador — Bosque de San Juan de Aragón 🌳
+# Monitoreo de la salud del arbolado — Bosque de San Juan de Aragón 🌳
 
 Visualizador web interactivo para explorar el estado de salud del arbolado del **Bosque de San Juan de Aragón** (CDMX) mediante el índice NDVI y segmentación de copas.
 
